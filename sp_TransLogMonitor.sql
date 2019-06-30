@@ -1,24 +1,20 @@
-USE DBA;
+USE [DBAMaint]
 GO
 
-/****** Object:  StoredProcedure [dbo].[sp_TransLogMonitor]    Script Date: 5/27/2017 4:43:32 PM ******/
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[sp_TransLogMonitor]') AND type IN (N'U'))
+DROP PROCEDURE [dbo].[sp_TransLogMonitor]
+
 SET ANSI_NULLS ON
 GO
 
 SET QUOTED_IDENTIFIER ON
 GO
 
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[sp_TransLogMonitor]') AND type in (N'P', N'PC'))
-BEGIN
-EXEC dbo.sp_executesql @statement = N'CREATE PROCEDURE [dbo].[sp_TransLogMonitor] AS' 
-END
-GO
 
-ALTER PROC [dbo].[sp_TransLogMonitor]
+
+CREATE PROC [dbo].[sp_TransLogMonitor]
 AS
 BEGIN
-	
-	SET NOCOUNT ON;
 
 	IF OBJECT_ID('tempdb..#TransLogMonitor') IS NOT NULL DROP TABLE #TransLogMonitor;
 	CREATE TABLE #TransLogMonitor
@@ -65,10 +61,7 @@ BEGIN
 	INSERT INTO #TransLogMonitor(DatabaseName, LogSizeMB, LogSpaceUsed, [Status])
 	EXEC ('DBCC SQLPERF(logspace)')
 
-	IF	@@VERSION LIKE 'Microsoft SQL Server 2017%'
-	OR	@@VERSION LIKE 'Microsoft SQL Server 2016%' 
-	OR	@@VERSION LIKE 'Microsoft SQL Server 2014%'
-	OR	@@VERSION LIKE 'Microsoft SQL Server 2012%'
+	IF @@VERSION LIKE 'Microsoft SQL Server 2012%' OR @@VERSION LIKE 'Microsoft SQL Server 2014%'
 	BEGIN
 		EXEC sp_MSforeachdb N'USE [?];
 			  INSERT INTO #LogInfo2012
@@ -110,4 +103,11 @@ BEGIN
 	DROP TABLE #results
 END
 
+
+GO
+
+SET ANSI_NULLS OFF
+GO
+
+SET QUOTED_IDENTIFIER OFF
 GO

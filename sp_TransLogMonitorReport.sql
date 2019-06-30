@@ -1,21 +1,18 @@
-USE DBA;
+USE [DBAMaint]
 GO
 
-/****** Object:  StoredProcedure [dbo].[sp_TransLogMonitorReport]    Script Date: 5/27/2017 4:43:44 PM ******/
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[sp_TransLogMonitorReport]') AND type IN (N'U'))
+DROP PROCEDURE [dbo].[sp_TransLogMonitorReport]
+
 SET ANSI_NULLS ON
 GO
 
 SET QUOTED_IDENTIFIER ON
 GO
 
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[sp_TransLogMonitorReport]') AND type in (N'P', N'PC'))
-BEGIN
-EXEC dbo.sp_executesql @statement = N'CREATE PROCEDURE [dbo].[sp_TransLogMonitorReport] AS' 
-END
-GO
 
 
-ALTER PROC [dbo].[sp_TransLogMonitorReport]
+CREATE PROC [dbo].[sp_TransLogMonitorReport]
 	@tableHTML NVARCHAR(MAX) OUTPUT
 AS
 BEGIN
@@ -57,4 +54,10 @@ BEGIN
 END
 
 
+GO
+
+SET ANSI_NULLS OFF
+GO
+
+SET QUOTED_IDENTIFIER OFF
 GO
